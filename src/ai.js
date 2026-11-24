@@ -109,15 +109,17 @@ export async function ensureDeviceModel(onProgress) {
 
 // Cloud model for hybrid inference. Vertex AI retired gemini-2.5-flash-lite
 // for new users (25 Nov 2026) and its 404 names gemini-3.5-flash-lite as the
-// replacement — the SDK sends this name for every cloud call; on-device
-// calls still use Gemini Nano via the Prompt API.
+// replacement. NOTE: with a hybrid `mode` set, a top-level `model` is IGNORED
+// by the SDK (it warns and keeps its default) — the cloud model MUST go in
+// `inCloudParams` (HybridParams: { mode, inCloudParams?: ModelParams }).
+// On-device calls still use Gemini Nano via the Prompt API.
 const CLOUD_MODEL = "gemini-3.5-flash-lite";
 
 function getModel(mode, generationConfig) {
   if (!ai) throw new Error("Firebase AI Logic is not initialized.");
-  const opts = { model: CLOUD_MODEL, mode };
-  if (generationConfig) opts.generationConfig = generationConfig;
-  return getGenerativeModel(ai, opts);
+  const inCloudParams = { model: CLOUD_MODEL };
+  if (generationConfig) inCloudParams.generationConfig = generationConfig;
+  return getGenerativeModel(ai, { mode, inCloudParams });
 }
 
 function friendlyError(err) {
