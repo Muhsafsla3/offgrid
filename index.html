@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offgrid — notes that think on-device</title>
+    <meta
+      name="description"
+      content="Offgrid is an offline-first notebook with hybrid AI: Gemini Nano answers on-device when it can, and falls back to Gemini in the cloud when it matters. Built with Firebase AI Logic for #BuildHybridAI 2026."
+    />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">◐</span>
+        <div>
+          <h1>Offgrid</h1>
+          <p class="tagline">Notes that think on-device.</p>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span id="onlinePill" class="pill">● Online</span>
+        <span id="devicePill" class="pill pill-muted" title="On-device model (Gemini Nano) status">Device: checking…</span>
+        <button id="downloadModelBtn" class="btn btn-small" type="button" title="Download the on-device model (needs a click, per Chrome rules)">
+          Download on-device model
+        </button>
+        <label class="mode-label" for="modeSelect">AI mode</label>
+        <select id="modeSelect" class="mode-select" title="Auto lets the router decide. On-device only never sends data to the cloud. Cloud only always uses Gemini in the cloud.">
+          <option value="auto" selected>Auto (hybrid)</option>
+          <option value="on-device">On-device only</option>
+          <option value="cloud">Cloud only</option>
+        </select>
+      </div>
+    </header>
+
+    <div id="setupBanner" class="setup-banner" hidden>
+      <strong>Firebase is not configured yet.</strong>
+      AI features are disabled until you add your project values:
+      copy <code>src/firebase-config.example.js</code> to
+      <code>src/firebase-config.js</code> and fill it in (see README § Setup).
+      Notes still work fully offline.
+    </div>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-actions">
+          <button id="newNoteBtn" class="btn btn-primary" type="button">+ New note</button>
+          <button id="sampleBtn" class="btn" type="button" title="Insert one clearly-labelled sample note to try the AI on">Load sample note</button>
+        </div>
+        <input id="searchInput" class="search" type="search" placeholder="Search notes…" aria-label="Search notes" />
+        <ul id="noteList" class="note-list" aria-label="Notes"></ul>
+        <div class="sidebar-foot">
+          <button id="syncBtn" class="btn btn-small" type="button">Sync now (Firestore)</button>
+          <span id="syncStatus" class="muted"></span>
+          <p class="muted small">
+            Notes are stored on this device (IndexedDB) and work offline.
+            Sync is optional and needs a Firebase project.
+          </p>
+        </div>
+      </aside>
+
+      <section class="editor" aria-label="Note editor">
+        <div class="editor-empty" id="emptyState">
+          <h2>No note selected</h2>
+          <p>Create a new note, or load the sample note to try the AI.</p>
+        </div>
+
+        <div id="editorBody" hidden>
+          <input id="titleInput" class="title-input" type="text" placeholder="Note title…" aria-label="Note title" />
+          <textarea id="bodyInput" class="body-input" placeholder="Write your field note here… Works offline. Your words stay on this device unless a task is routed to the cloud (see the routing badge)." aria-label="Note body"></textarea>
+          <div class="editor-row">
+            <input id="tagsInput" class="tags-input" type="text" placeholder="tags, comma separated" aria-label="Tags" />
+            <span id="charCount" class="muted small"></span>
+            <button id="exportBtn" class="btn btn-small" type="button">Export .md</button>
+            <button id="deleteBtn" class="btn btn-small btn-danger" type="button">Delete</button>
+          </div>
+
+          <div class="image-row">
+            <label class="btn btn-small" for="imageInput">📷 Add whiteboard photo</label>
+            <input id="imageInput" type="file" accept="image/png,image/jpeg" hidden />
+            <span id="imageName" class="muted small"></span>
+            <button id="describeBtn" class="btn btn-small" type="button" disabled>Describe image (on-device)</button>
+          </div>
+          <div id="imagePreviewWrap" class="image-preview" hidden>
+            <img id="imagePreview" alt="Attached photo" />
+          </div>
+
+          <h3>Ask the AI <span class="muted small">(single-turn — on-device first)</span></h3>
+          <div class="ai-actions">
+            <button class="btn ai-btn" data-task="summarize" type="button">Summarize</button>
+            <button class="btn ai-btn" data-task="key-points" type="button">Key points</button>
+            <button class="btn ai-btn" data-task="action-items" type="button">Action items</button>
+            <button class="btn ai-btn" data-task="title" type="button">Make a title</button>
+          </div>
+          <div class="ask-row">
+            <input id="askInput" class="ask-input" type="text" placeholder="Ask about this note… (e.g. What should I follow up on?)" aria-label="Ask about this note" />
+            <button id="askBtn" class="btn btn-primary" type="button">Ask</button>
+          </div>
+
+          <div id="aiStatus" class="ai-status" aria-live="polite"></div>
+          <div id="aiResults" class="ai-results"></div>
+
+          <h3>Ask across all notes <span class="muted small">(needs the cloud — it reasons over many notes)</span></h3>
+          <div class="ask-row">
+            <input id="askManyInput" class="ask-input" type="text" placeholder="Ask across all your notes… (e.g. What are my open follow-ups?)" aria-label="Ask across all notes" />
+            <button id="askManyBtn" class="btn" type="button">Ask all notes</button>
+          </div>
+          <div id="askManyResult" class="ai-results"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>Offgrid — built with <strong>Firebase AI Logic</strong> (hybrid inference: Gemini Nano on-device, Gemini in the cloud) for #BuildHybridAI 2026.</span>
+      <span id="routeInfo" class="muted small"></span>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

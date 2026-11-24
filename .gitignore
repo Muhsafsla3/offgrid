@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.DS_Store
+# NOTE: src/firebase-config.js is intentionally COMMITTED. It holds Firebase
+# *client* values only (apiKey, projectId, App Check site key) — the web
+# apiKey is not a secret and is meant to be embedded in a public web app.
+# Never put server credentials, service-account keys, or App Check debug
+# tokens in this repo.

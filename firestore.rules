@@ -1,0 +1,16 @@
+rules_version = '2';
+
+// Firestore rules for Offgrid sync.
+// Notes are written by anonymous users (one document per note, id generated
+// on the client). Any authenticated user may read/write: this keeps the
+// hackathon demo simple. For production, scope each document to its owner's
+// uid (store request.auth.uid in the doc and check it here).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /notes/{noteId} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+  }
+}
