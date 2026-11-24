@@ -109,10 +109,16 @@ not yet enabled in the Firebase project (the app works without them).
 
 ## Deploy
 
+**Live demo:** https://muhsafsla3.github.io/offgrid/ (GitHub Pages,
+branch `gh-pages`, rebuilt from `dist/`).
+
 ```sh
 npm run build
-# then deploy dist/ — e.g. Firebase Hosting:
-#   npm i -g firebase-tools && firebase login && firebase init hosting && firebase deploy
+# GitHub Pages (project site, base /offgrid/):
+#   VITE_BASE=/offgrid/ npm run build
+#   then copy dist/ to the orphan gh-pages branch and push.
+# Vercel (served at domain root, default base "/"):
+#   import the repo in the Vercel dashboard (project "offgrid").
 ```
 
 ## Submission (Devpost #BuildHybridAI 2026)
